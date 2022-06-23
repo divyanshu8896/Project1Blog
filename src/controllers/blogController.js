@@ -11,7 +11,7 @@ const valid = function (value) {
 
 const createBlog = async function (req, res) {
     try {
-        let blogdata = req.body
+        let blogData = req.body
         
         if (!blogData.title) { return res.status(400).send({ status: false, message: "title is required" }) }
 
@@ -27,11 +27,11 @@ const createBlog = async function (req, res) {
         if (!valid(blogData.body)) { return res.status(400).send({ status: false, message: "body is not valid" }) }
 
         if (!valid(blogData.category)) { return res.status(400).send({ status: false, message: "category is not valid" }) }
-        let Id = blogdata.author_Id 
+        let Id = blogData.author_Id 
         let author = await AuthorModel.findOne({ _id: Id })
 
         if (author == null) { { return res.status(400).send({ status: false, message: "author is not persent" }) } }
-         let blogCreated = await BlogModel.create(blogdata)
+         let blogCreated = await BlogModel.create(bloDdata)
         res.status(201).send({ status:true,data: blogCreated })
         }
      catch (err) { return res.status(500).send({ status: false, msg: err.message }) }
@@ -104,10 +104,48 @@ const updateBlog = async function (req , res) {
         else { res.status(200).send({ status: true, data: list }) }
 
     }
-    catch{}
+    catch (err) { return res.status(500).send({ status: false, msg: err.message }) }
 
 }
+
+const deleteBlog = async function (req, res) {
+    try {
+
+        blogId = req.params.blogId
+        const isBlogId = await BlogModel.findOne({_id:blogId, isDeleted:false })
+        if (isBlogId == null) return res.status(404).send({ status: false, msg: "Blog not found" })
+
+        const deletingBlog = await BlogModel.findOneAndUpdate({ _id: blogId}, { $set: { isDeleted: true, isDeletedAt: new Date() } }, { new: true })
+
+        res.status(200).send({ status: true, msg: "deletion successfull" })
+
+    } catch (err) { return res.status(500).send({ status: false, msg: err.message }) }
+}
+
+
+
+const deleteByQuerying = async function(req,res){
+   try{ const data = req.query
+
+       const category = req.query.category
+       const authorId = req.query.authorid
+       const tagName = req.query.tags
+       const subcategory = req.query.subcategory 
+    //    const unpublished
+    // check if the query field is empty:
+    if(Object.keys(data).length ==0) return res.status(400).send({status: false, msg:"query field is empty"}) 
+
+    // finding documents using query params
+    const ToBeDeleted= await BlogModel.findOneAndUpdate({isDeleted:false, $or:[{category:category}, {author_Id: authorId},{tags:tagName},{subCategory:subcategory}]}, {$set:{isDeleted:true, isDeletedAt: new Date() }}, {new:true})
+      
+    if(ToBeDeleted == null) return res.status(404).send({status: false, msg:"Blog not found"})
+
+    res.status(200).send({status:true, msg:"deletion successfull"})
+   }catch (err) { return res.status(500).send({ status: false, msg: err.message }) }
+    }
 
 module.exports.createBlog = createBlog
 module.exports.blogList = blogList
 module.exports.updateBlog = updateBlog
+module.exports.deleteBlog = deleteBlog
+module.exports.deleteByQuerying = deleteByQuerying
