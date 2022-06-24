@@ -9,17 +9,10 @@ const valid = function (value) {
 }
 
 const validateEmail = (email) => {
-    return email.match(
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    );
+    return email.match(/^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,15}$/);
   };
 
-  const validatePassword = (pwd) =>{
-    return pwd.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{5,}$/)
-
-  }
-
-const createAuthor = async function (req, res) {
+ const createAuthor = async function (req, res) {
     try {
         let author = req.body
 
@@ -47,8 +40,6 @@ const createAuthor = async function (req, res) {
         
         if(!validateEmail(author.email)) { return res.status(400).send({status:false, msg:"Enter the valid email"})}
         
-        if(!validatePassword(author.password)) {return res.status(400).send({status:false, msg:"your password is not strong. Pwd should have atleast one capital letter, one smaller letter and a special character"})}
-         
         let authorCreated = await AuthorModel.create(author)
         res.status(201).send({ status:true,data: authorCreated })
         }
