@@ -126,6 +126,7 @@ const updateBlog = async function (req, res) {
             isPublished: true
 
         }, { new: true })
+       
         if (list == null) {
             res.status(404).send({ status: false, msg: "blog not found" })
         }
@@ -168,7 +169,7 @@ const deleteByQuerying = async function (req, res) {
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "Enter the details of blog that you would like to delete" })
 
         //finding document using query params
-        const ToBeDeleted = await BlogModel.findOneAndUpdate({ isDeleted: false, $or: [{ category: category }, { authorId: authorId }, { tags: tagName }, { subcategory: subcategory },{isPublished:isPublished}] }, { $set: { isDeleted: true, deletedAt: new Date() } })
+        const ToBeDeleted = await BlogModel.findOneAndUpdate({ $or: [{ category: category }, { authorId: authorId }, { tags: tagName }, { subcategory: subcategory },{isPublished:isPublished}] }, { $set: { isDeleted: true, deletedAt: new Date() } })
 
         if (ToBeDeleted == null) return res.status(404).send({ status: false, msg: "Blog not found" })
 
