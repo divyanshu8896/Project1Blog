@@ -6,7 +6,7 @@ const BlogModel = require("../models/blogModel")
 const authentication = function (req, res, next) {
     try {
         let token = req.headers["x-api-key"]
-        // console.log(token)
+       
         if (!token) {
             return res.status(404).send({ status: false, msg: 'Token is Mandatory' })
         }
@@ -61,8 +61,7 @@ const deleteByquerying = async function (req, res, next) {
         let token = req.headers["x-api-key"]
         let decodedToken = jwt.verify(token, "functionUp")
         let decodedAuthor = decodedToken.userId
-        console.log(decodedAuthor)
-
+        
         // checks if query field is empty
         if (Object.keys(requestBody).length == 0) { return res.status(400).send({ status: false, msg: "Enter the details of the blog that you would like to delete" }) }
 
@@ -81,7 +80,7 @@ const deleteByquerying = async function (req, res, next) {
                     return next()
                 }
             }
-            res.status(400).send({ status: false, msg: "You are not authorized to perform this action" })
+          res.status(400).send({ status: false, msg: "You are not authorized to perform this action" })
         }
 
     }
